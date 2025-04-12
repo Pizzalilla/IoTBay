@@ -1,0 +1,11 @@
+com\mycompany\labs\model\CartItem.class
+com\mycompany\labs\model\Invoice.class
+com\mycompany\labs\model\Shipment.class
+com\mycompany\labs\model\User.class
+com\mycompany\labs\model\Payment.class
+com\mycompany\labs\model\Supplier.class
+com\mycompany\labs\model\OrderProduct.class
+com\mycompany\labs\model\Staff.class
+com\mycompany\labs\model\Order.class
+com\mycompany\labs\model\Product.class
+com\mycompany\labs\model\Customer.class
