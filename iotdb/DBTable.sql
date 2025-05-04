@@ -10,7 +10,7 @@ DROP TABLE Users;
 
 -- USERS Table (used by customers and staff)
 CREATE TABLE Users (
-    userID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    customerID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name VARCHAR(50),
     email VARCHAR(255) UNIQUE,
     password VARCHAR(255),
@@ -44,11 +44,11 @@ CREATE TABLE Product (
 -- ORDERS Table
 CREATE TABLE Orders (
     orderID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    userID INT,
+    customerID INT,
     staffID INT,
     orderDate DATE,
     status VARCHAR(50),
-    FOREIGN KEY (userID) REFERENCES Users(userID),
+    FOREIGN KEY (customerID) REFERENCES Users(customerID),
     FOREIGN KEY (staffID) REFERENCES Staff(staffID)
 );
 
@@ -81,7 +81,7 @@ CREATE TABLE CartItem (
     productID INT,
     quantity INT,
     dateAdded DATE,
-    FOREIGN KEY (customerID) REFERENCES Users(userID),
+    FOREIGN KEY (customerID) REFERENCES Users(customerID),
     FOREIGN KEY (productID) REFERENCES Product(productID)
 );
 
@@ -104,7 +104,7 @@ VALUES
 ('Motion Detector', 'Detects motion in range', 45.50, 30, 'Sensor', 2);
 
 -- Sample ORDERS
-INSERT INTO Orders (userID, staffID, orderDate, status)
+INSERT INTO Orders (customerID, staffID, orderDate, status)
 VALUES 
 (1, 1, DATE('2025-05-01'), 'Pending'),
 (2, 2, DATE('2025-05-02'), 'Confirmed');
