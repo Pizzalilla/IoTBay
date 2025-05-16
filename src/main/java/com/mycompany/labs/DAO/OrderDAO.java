@@ -13,8 +13,8 @@ import com.mycompany.labs.model.Order;
 public class OrderDAO {
     private Connection conn;
 
-    public OrderDAO(Connection conn) {
-        this.conn = conn;
+    public OrderDAO(Connection conn) throws SQLException {
+        this.conn = DB.getConnection();
     }
 
     // CREATE a new order

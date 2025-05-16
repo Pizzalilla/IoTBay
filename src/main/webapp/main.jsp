@@ -4,6 +4,8 @@
     Author     : 20828
 --%>
 <%@page import="com.mycompany.labs.model.User"%>
+<%@ page import="com.mycompany.labs.model.Device" %>
+<%@ page import="java.util.List" %>
 <%
     User currentUser = (User) request.getSession().getAttribute("currentUser");
     if (currentUser == null) {
@@ -21,14 +23,17 @@
     <body>
         <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/">IoTBay</a>
+                <a class="navbar-brand" href="./home">IoTBay</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Home</a>
+                            <a class="nav-link active" aria-current="page" href="./home">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="devices">Devices</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="/">Orders</a>
@@ -44,7 +49,7 @@
                         </li>
                     </ul>
                     <form class="d-flex" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                        <input class="form-control me-2" type="search" placeholder="Search name or type" name="keyword">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
 
@@ -54,17 +59,30 @@
             </div>
         </nav>
         <div class="container-md mt-4">
+            <div class="row row-cols-lg-4 row-cols-md-3 row-cols-2 g-3">
+                <%
+                    List<Device> deviceList = (List<Device>) request.getAttribute("devices");
+                    for(Device device : deviceList){
+                        %>
+                <div class="col">
+                    <div class="card">
+                        <img src="images/<%=device.getImageName()%>" class="card-img-top" height="200">
+                        <div class="card-body">
+                            <h5 class="card-title"><%=device.getDeviceName()%></h5>
+                            <p class="card-text"><%=device.getType()%></p>
+                            <p class="card-text text-danger fs-3">$<%=device.getPrice()%></p>
+                            <a href="#" class="btn btn-primary">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+                <%
+                    }
+                %>
 
+            </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     
-        <div class="container mt-4">
-            <h3>User Info</h3>
-            <p><strong>Email:</strong> <%= currentUser.getEmail() %></p>
-            <p><strong>Mobile:</strong> <%= currentUser.getMobile() %></p>
-            <p><strong>Gender:</strong> <%= currentUser.getGender() %></p>
-            <p><strong>Favourite Colour:</strong> <%= currentUser.getFavouriteColour() %></p>
-        </div>
 
 </body>
 </html>

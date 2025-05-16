@@ -10,7 +10,7 @@
             User user = (User) application.getAttribute(email);
             if (user != null && user.getPassword().equals(password)) {
                 session.setAttribute("currentUser", user);
-                response.sendRedirect("main.jsp");
+                response.sendRedirect("home");
                 return;
             } else {
                 request.setAttribute("loginError", "Invalid email or password.");
