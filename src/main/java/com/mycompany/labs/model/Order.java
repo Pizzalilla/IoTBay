@@ -7,9 +7,17 @@ public class Order implements Serializable {
 
     private int orderID;
     private int customerID;
-    private int staffID;
     private Date orderDate;
     private String status;
+
+    public Order() {}
+
+    public Order(int orderID, int customerID, Date orderDate, String status) {
+        this.orderID = orderID;
+        this.customerID = customerID;
+        this.orderDate = orderDate;
+        this.status = status;
+    }
 
     public int getOrderID() { 
         return orderID; 
@@ -23,13 +31,6 @@ public class Order implements Serializable {
     }
     public void setCustomerID(int customerID) { 
         this.customerID = customerID; 
-    }
-
-    public int getStaffID() { 
-        return staffID; 
-    }
-    public void setStaffID(int staffID) { 
-        this.staffID = staffID; 
     }
 
     public Date getOrderDate() { 

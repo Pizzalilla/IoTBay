@@ -1,6 +1,7 @@
 package com.mycompany.labs.DAO;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,88 +9,116 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mycompany.labs.model.CartItem;
 import com.mycompany.labs.model.Order;
 
 public class OrderDAO {
     private Connection conn;
 
-    public OrderDAO(Connection conn) throws SQLException {
-        this.conn = DB.getConnection();
+    public OrderDAO(Connection conn) {
+        this.conn = conn;
     }
 
-    // CREATE a new order
-    public void createOrder(Order order) throws SQLException {
-        String sql = "INSERT INTO Orders (customerID, staffID, orderDate, status) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, order.getCustomerID());
-            stmt.setInt(2, order.getStaffID());
-            stmt.setDate(3, new java.sql.Date(order.getOrderDate().getTime()));
-            stmt.setString(4, order.getStatus());
-            stmt.executeUpdate();
+    public int createOrder(Integer customerID, Date orderDate, String status) throws SQLException {
+        String sql = "INSERT INTO Orders (customerID, orderDate, status) VALUES (?, ?, ?)";
+        PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        if (customerID != null) {
+            ps.setInt(1, customerID);
+        } else {
+            ps.setNull(1, java.sql.Types.INTEGER); // ✅ handle anonymous
+        }
 
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                order.setOrderID(rs.getInt(1));
-            }
+        ps.setDate(2, new java.sql.Date(orderDate.getTime()));
+        ps.setString(3, status);
+        ps.executeUpdate();
+
+        ResultSet rs = ps.getGeneratedKeys();
+        if (rs.next()) {
+            return rs.getInt(1); // return generated orderID
+        } else {
+            throw new SQLException("Failed to create order.");
         }
     }
 
-    // READ all orders for a given customer
-    public List<Order> findOrdersByCustomer(int customerID) throws SQLException {
-        List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM Orders WHERE customerID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, customerID);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                Order order = new Order();
-                order.setOrderID(rs.getInt("orderID"));
-                order.setCustomerID(rs.getInt("customerID"));
-                order.setStaffID(rs.getInt("staffID"));
-                order.setOrderDate(rs.getDate("orderDate"));
-                order.setStatus(rs.getString("status"));
-                orders.add(order);
-            }
+    public void addOrderProduct(int orderID, int deviceID, int quantity) throws SQLException {
+        // Optional: fetch unit price from Device table
+        String priceQuery = "SELECT price FROM Device WHERE deviceId = ?";
+        PreparedStatement priceStmt = conn.prepareStatement(priceQuery);
+        priceStmt.setInt(1, deviceID);
+        ResultSet priceRs = priceStmt.executeQuery();
+        double unitPrice = 0;
+
+        if (priceRs.next()) {
+            unitPrice = priceRs.getDouble("price");
         }
+
+        String sql = "INSERT INTO OrderProduct (orderID, deviceId, quantity, unitPrice) VALUES (?, ?, ?, ?)";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, orderID);
+        ps.setInt(2, deviceID);
+        ps.setInt(3, quantity);
+        ps.setDouble(4, unitPrice);
+        ps.executeUpdate();
+    }
+
+    public void insertOrder(List<CartItem> cart, Integer customerID) throws SQLException {
+        java.util.Date now = new java.util.Date();
+        java.sql.Date sqlDate = new java.sql.Date(now.getTime());
+
+        // Create the order and get the generated order ID
+        int orderID = createOrder(customerID, sqlDate, "Pending");
+
+        // Insert each cart item into OrderProduct
+        for (CartItem item : cart) {
+            addOrderProduct(orderID, item.getDeviceID(), item.getQuantity());
+        }
+    }
+
+    public ArrayList<Order> getOrderHistory(int customerID) throws SQLException {
+        ArrayList<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM Orders WHERE customerID = ? ORDER BY orderDate DESC";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, customerID);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            Order order = new Order(
+                rs.getInt("orderID"),
+                rs.getInt("customerID"),
+                rs.getDate("orderDate"),
+                rs.getString("status")
+            );
+            orders.add(order);
+        }
+
         return orders;
     }
 
-    // READ a single order by orderID
-    public Order getOrderById(int orderID) throws SQLException {
-        String sql = "SELECT * FROM Orders WHERE orderID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, orderID);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                Order order = new Order();
-                order.setOrderID(rs.getInt("orderID"));
-                order.setCustomerID(rs.getInt("customerID"));
-                order.setStaffID(rs.getInt("staffID"));
-                order.setOrderDate(rs.getDate("orderDate"));
-                order.setStatus(rs.getString("status"));
-                return order;
-            }
+    public ArrayList<Order> searchOrders(int customerID, String orderID, String orderDate) throws SQLException {
+        ArrayList<Order> results = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM Orders WHERE customerID = ?");
+        if (orderID != null && !orderID.isEmpty()) {
+            sql.append(" AND orderID = ").append(orderID);
         }
-        return null;
-    }
+        if (orderDate != null && !orderDate.isEmpty()) {
+            sql.append(" AND orderDate = '").append(orderDate).append("'");
+        }
+        sql.append(" ORDER BY orderDate DESC");
 
-    // UPDATE order status or staff assignment
-    public void updateOrder(Order order) throws SQLException {
-        String sql = "UPDATE Orders SET staffID = ?, status = ? WHERE orderID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, order.getStaffID());
-            stmt.setString(2, order.getStatus());
-            stmt.setInt(3, order.getOrderID());
-            stmt.executeUpdate();
-        }
-    }
+        PreparedStatement ps = conn.prepareStatement(sql.toString());
+        ps.setInt(1, customerID);
+        ResultSet rs = ps.executeQuery();
 
-    // DELETE an unsubmitted order
-    public void deleteOrder(int orderID) throws SQLException {
-        String sql = "DELETE FROM Orders WHERE orderID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, orderID);
-            stmt.executeUpdate();
+        while (rs.next()) {
+            Order order = new Order(
+                rs.getInt("orderID"),
+                rs.getInt("customerID"),
+                rs.getDate("orderDate"),
+                rs.getString("status")
+            );
+            results.add(order);
         }
+
+        return results;
     }
 }

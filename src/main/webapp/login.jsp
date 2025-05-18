@@ -19,6 +19,21 @@
     }
 %>
 
+<%@ page import="java.sql.*" %>
+<%@ page import="com.mycompany.labs.DAO.DB" %>
+
+<%
+    try {
+        Connection conn = DB.getConnection();
+        out.println("<p style='color:green;'>✅ Connected to database!</p>");
+    } catch (Exception e) {
+        out.println("<p style='color:red;'>❌ DB connection failed:</p>");
+        e.printStackTrace(new java.io.PrintWriter(out));
+
+    }
+%>
+
+
 <!DOCTYPE html>
 <html>
     <head>
