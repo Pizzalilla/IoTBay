@@ -1,6 +1,7 @@
 package com.mycompany.labs.controller;
 
-import com.mycompany.labs.dao.UserDao;
+import com.mycompany.labs.DAO.UserDao;
+
 import com.mycompany.labs.model.User;
 
 import javax.servlet.ServletException;
