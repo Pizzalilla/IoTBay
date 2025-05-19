@@ -1,116 +1,96 @@
--- Enable foreign key support
-PRAGMA foreign_keys = ON;
-
--- Drop tables if they exist (respecting dependency order)
-DROP TABLE IF EXISTS CartItem;
-DROP TABLE IF EXISTS Payment;
-DROP TABLE IF EXISTS OrderProduct;
-DROP TABLE IF EXISTS Orders;
-DROP TABLE IF EXISTS Device;
-DROP TABLE IF EXISTS Staff;
-DROP TABLE IF EXISTS Users;
-
--- USERS Table (used by customers and staff)
+-- Unified USERS Table
 CREATE TABLE Users (
-                       customerID INTEGER PRIMARY KEY AUTOINCREMENT,
-                       name TEXT,
-                       email TEXT UNIQUE,
-                       password TEXT,
-                       gender TEXT,
-                       mobile TEXT,
-                       favoriteColor TEXT
+                       userID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                       firstName VARCHAR(50),
+                       lastName VARCHAR(50),
+                       email VARCHAR(255) UNIQUE,
+                       password VARCHAR(255),
+                       gender VARCHAR(10),
+                       mobile VARCHAR(15),
+                       address VARCHAR(255),
+                       type VARCHAR(20),     -- 'customer' or 'staff'
+                       position VARCHAR(50), -- Only for staff; nullable for customers
+                       active BOOLEAN DEFAULT TRUE
 );
 
--- STAFF Table
-CREATE TABLE Staff (
-                       staffID INTEGER PRIMARY KEY AUTOINCREMENT,
-                       firstName TEXT,
-                       lastName TEXT,
-                       email TEXT UNIQUE,
-                       password TEXT,
-                       position TEXT,
-                       address TEXT
+CREATE TABLE Log (
+                     id VARCHAR(36) PRIMARY KEY,
+                     userId INT,
+                     loginTime TIMESTAMP,
+                     logoutTime TIMESTAMP
 );
 
-CREATE TABLE Device (
-                        deviceId INTEGER PRIMARY KEY AUTOINCREMENT,
-                        deviceName TEXT,
-                        price NUMERIC,
-                        type TEXT,
-                        stockQty INTEGER,
-                        imageName TEXT
+-- PRODUCT Table
+CREATE TABLE Product (
+                         productID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                         name VARCHAR(100),
+                         description VARCHAR(255),
+                         price DECIMAL(10,2),
+                         stockQuantity INT,
+                         category VARCHAR(50),
+                         supplierID INT
 );
 
 -- ORDERS Table
 CREATE TABLE Orders (
-                        orderID INTEGER PRIMARY KEY AUTOINCREMENT,
-                        customerID INTEGER,
-                        staffID INTEGER,
-                        orderDate TEXT,
-                        status TEXT,
-                        FOREIGN KEY (customerID) REFERENCES Users(customerID),
-                        FOREIGN KEY (staffID) REFERENCES Staff(staffID)
+                        orderID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                        customerID INT,
+                        staffID INT,
+                        orderDate DATE,
+                        status VARCHAR(50)
 );
 
--- ORDERPRODUCT Table (linking devices to orders)
+-- ORDERPRODUCT Table
 CREATE TABLE OrderProduct (
-                              orderProductID INTEGER PRIMARY KEY AUTOINCREMENT,
-                              orderID INTEGER,
-                              deviceId INTEGER,
-                              quantity INTEGER,
-                              unitPrice NUMERIC,
-                              FOREIGN KEY (orderID) REFERENCES Orders(orderID),
-                              FOREIGN KEY (deviceId) REFERENCES Device(deviceId)
+                              orderProductID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                              orderID INT,
+                              productID INT,
+                              quantity INT,
+                              unitPrice DECIMAL(10,2)
 );
 
 -- PAYMENT Table
 CREATE TABLE Payment (
-                         paymentID INTEGER PRIMARY KEY AUTOINCREMENT,
-                         orderID INTEGER,
-                         paymentMethod TEXT,
-                         paymentDate TEXT,
-                         amount NUMERIC,
-                         status TEXT,
-                         FOREIGN KEY (orderID) REFERENCES Orders(orderID)
+                         paymentID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                         orderID INT,
+                         paymentMethod VARCHAR(50),
+                         paymentDate DATE,
+                         amount DECIMAL(10,2),
+                         status VARCHAR(50)
 );
 
--- CARTITEM Table (for pre-order functionality)
+-- CARTITEM Table
 CREATE TABLE CartItem (
-                          cartItemID INTEGER PRIMARY KEY AUTOINCREMENT,
-                          customerID INTEGER,
-                          deviceId INTEGER,
-                          quantity INTEGER,
-                          dateAdded TEXT,
-                          FOREIGN KEY (customerID) REFERENCES Users(customerID),
-                          FOREIGN KEY (deviceId) REFERENCES Device(deviceId)
+                          cartItemID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                          userID INT,
+                          productID INT,
+                          quantity INT,
+                          dateAdded DATE
 );
 
--- Sample USERS
-INSERT INTO Users (name, email, password, gender, mobile, favoriteColor)
+-- Sample USERS (customers and staff)
+INSERT INTO Users (firstName, lastName, email, password, gender, mobile, address, type, position)
 VALUES
-    ('Alice Smith', 'alice@example.com', 'pass123', 'Female', '0412345678', 'Blue'),
-    ('Bob Lee', 'bob@example.com', 'securepass', 'Male', '0423456789', 'Green');
+    ('Alice', 'Smith', 'alice@example.com', 'pass123', 'Female', '0412345678', '789 Customer Rd', 'customer', NULL),
+    ('Bob', 'Lee', 'bob@example.com', 'securepass', 'Male', '0423456789', '321 User Ave', 'customer', NULL),
+    ('John', 'Doe', 'jdoe@iotbay.com', 'adminpass', NULL, NULL, '123 Admin St', 'staff', 'Manager'),
+    ('Charlie', 'Nguyen', 'charlie.nguyen@example.com', 'charliepass', 'Male', '0434567890', '987 New St', 'customer', NULL),
+    ('Jane', 'Brown', 'jbrown@iotbay.com', 'staffpass', NULL, NULL, '456 Sales Rd', 'staff', 'Salesperson');
 
--- Sample STAFF
-INSERT INTO Staff (firstName, lastName, email, password, position, address)
+-- Sample PRODUCTS
+INSERT INTO Product (name, description, price, stockQuantity, category, supplierID)
 VALUES
-    ('John', 'Doe', 'jdoe@iotbay.com', 'adminpass', 'Manager', '123 Admin St'),
-    ('Jane', 'Brown', 'jbrown@iotbay.com', 'staffpass', 'Salesperson', '456 Sales Rd');
-
--- Sample DEVICES
-INSERT INTO Device (deviceName, price, type, stockQty, imageName)
-VALUES
-    ('Temperature Sensor', 25.99, 'Sensor', 50, 'temp_sensor.png'),
-    ('Motion Detector', 45.50, 'Sensor', 30, 'motion_detector.png');
+    ('Temperature Sensor', 'Measures temperature', 25.99, 50, 'Sensor', 1),
+    ('Motion Detector', 'Detects motion in range', 45.50, 30, 'Sensor', 2);
 
 -- Sample ORDERS
 INSERT INTO Orders (customerID, staffID, orderDate, status)
 VALUES
-    (1, 1, '2025-05-01', 'Pending'),
-    (2, 2, '2025-05-02', 'Confirmed');
+    (1, 3, DATE('2025-05-01'), 'Pending'),
+    (2, 4, DATE('2025-05-02'), 'Confirmed');
 
 -- Sample ORDERPRODUCTS
-INSERT INTO OrderProduct (orderID, deviceId, quantity, unitPrice)
+INSERT INTO OrderProduct (orderID, productID, quantity, unitPrice)
 VALUES
     (1, 1, 2, 25.99),
     (2, 2, 1, 45.50);
@@ -118,11 +98,11 @@ VALUES
 -- Sample PAYMENTS
 INSERT INTO Payment (orderID, paymentMethod, paymentDate, amount, status)
 VALUES
-    (1, 'Credit Card', '2025-05-01', 51.98, 'Completed'),
-    (2, 'PayPal', '2025-05-02', 45.50, 'Pending');
+    (1, 'Credit Card', DATE('2025-05-01'), 51.98, 'Completed'),
+    (2, 'PayPal', DATE('2025-05-02'), 45.50, 'Pending');
 
 -- Sample CARTITEMS
-INSERT INTO CartItem (customerID, deviceId, quantity, dateAdded)
+INSERT INTO CartItem (userID, productID, quantity, dateAdded)
 VALUES
-    (1, 1, 1, '2025-04-30'),
-    (2, 2, 2, '2025-04-29');
+    (1, 1, 1, DATE('2025-04-30')),
+    (2, 2, 2, DATE('2025-04-29'));
