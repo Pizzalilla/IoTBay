@@ -4,16 +4,16 @@ import java.io.Serializable;
 
 public class OrderProduct implements Serializable {
 
-    private int productID;
+    private int deviceID;
     private int orderID;
     private int quantity;
     private double unitPrice;
 
-    public int getProductID() { 
-        return productID; 
+    public int getDeviceID() { 
+        return deviceID; 
     }
-    public void setProductID(int productID) { 
-        this.productID = productID; 
+    public void setDeviceID(int deviceID) { 
+        this.deviceID = deviceID; 
     }
 
     public int getOrderID() { 
