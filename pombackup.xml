@@ -34,12 +34,6 @@
             <version>3.32.3.8</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derbyclient</artifactId>
-            <version>10.9.1.0</version>
-        </dependency>
-
         <!-- JUnit for tests -->
         <dependency>
             <groupId>junit</groupId>

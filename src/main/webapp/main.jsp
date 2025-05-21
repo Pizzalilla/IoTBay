@@ -33,9 +33,6 @@
                             <a class="nav-link active" aria-current="page" href="./home">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="devices">Devices</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="/">Orders</a>
                         </li>
                         <li class="nav-item">
@@ -44,9 +41,17 @@
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="/">Payments</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Users</a>
-                        </li>
+                        <% if(currentUser.isStaff()) {
+                            %>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="devices">Devices</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/">Users</a>
+                            </li>
+                        <%
+                        }%>
                     </ul>
                     <form class="d-flex" role="search">
                         <input class="form-control me-2" type="search" placeholder="Search name or type" name="keyword">

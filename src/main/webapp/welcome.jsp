@@ -30,6 +30,6 @@
 <body>
     <h2>Welcome, <%= firstName %>!</h2>
     <p>Your details have been saved. Proceed to the main page.</p>
-    <a href="main.jsp">Go to Main Page</a>
+    <a href="home">Go to Main Page</a>
 </body>
 </html>
