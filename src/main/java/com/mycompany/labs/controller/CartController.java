@@ -72,7 +72,6 @@ public class CartController extends HttpServlet {
                 int deviceID = Integer.parseInt(request.getParameter("deviceID"));
                 int newQuantity = Integer.parseInt(request.getParameter("quantity"));
 
-                // ✅ Check stock limit
                 String stockQuery = "SELECT stockQty FROM Device WHERE deviceId = ?";
                 PreparedStatement ps = conn.prepareStatement(stockQuery);
                 ps.setInt(1, deviceID);
@@ -83,8 +82,7 @@ public class CartController extends HttpServlet {
                     if (newQuantity <= stockQty) {
                         cartDAO.updateCartItemQuantity(cartItemID, newQuantity);
                     } else {
-                        System.out.println("⚠️ Quantity exceeds stock — update skipped.");
-                        // Optional: set a session error message to show in cart.jsp
+                        System.out.println("Quantity exceeds stock — update skipped.");
                     }
                 }
 
