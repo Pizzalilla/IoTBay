@@ -14,7 +14,7 @@ if (email != null && password != null) {
         user.setFirstName("Kai");
         user.setLastName("Cust");
 
-        // ✅ Assume customer@test.com has customerID = 1
+        //Assume customer@test.com has customerID = 1
         session.setAttribute("customerID", 1);
         session.setAttribute("currentUser", user);
         application.setAttribute(email, user);
@@ -34,22 +34,6 @@ if (email != null && password != null) {
     }
 }
 %>
-
-
-<%@ page import="java.sql.*" %>
-<%@ page import="com.mycompany.labs.DAO.DB" %>
-
-<%
-    try {
-        Connection conn = DB.getConnection();
-        out.println("<p style='color:green;'>✅ Connected to database!</p>");
-    } catch (Exception e) {
-        out.println("<p style='color:red;'>❌ DB connection failed:</p>");
-        e.printStackTrace(new java.io.PrintWriter(out));
-
-    }
-%>
-
 
 <!DOCTYPE html>
 <html>
