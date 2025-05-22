@@ -92,6 +92,16 @@ public class CartController extends HttpServlet {
                 if (!cartItems.isEmpty()) {
                     OrderDAO orderDAO = new OrderDAO(conn);
                     orderDAO.insertOrder(cartItems, customerID);
+
+                    for (CartItem item : cartItems) {
+                        String updateStockSQL = "UPDATE Device SET stockQty = stockQty - ? WHERE deviceId = ?";
+                        try (PreparedStatement stockPS = conn.prepareStatement(updateStockSQL)) {
+                            stockPS.setInt(1, item.getQuantity());
+                            stockPS.setInt(2, item.getDeviceID());
+                            stockPS.executeUpdate();
+                        }
+                    }
+
                     cartDAO.clearCart(customerID);
                 }
 
