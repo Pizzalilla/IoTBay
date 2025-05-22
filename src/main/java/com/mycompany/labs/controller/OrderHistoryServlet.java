@@ -41,7 +41,6 @@ public class OrderHistoryServlet extends HttpServlet {
                 orders = dao.getOrderHistory(customerID);
             }
 
-            // ✅ Now using OrderProduct
             Map<Integer, List<OrderProduct>> orderDetailsMap = new HashMap<>();
             for (Order order : orders) {
                 List<OrderProduct> details = dao.getOrderDetails(order.getOrderID());
