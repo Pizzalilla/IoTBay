@@ -37,19 +37,15 @@ public class SubmitOrderController extends HttpServlet {
                 return;
             }
 
-            // Step 1: Create a new order
             Date orderDate = new Date(System.currentTimeMillis());
             int orderID = orderDAO.createOrder(customerID, orderDate, "Submitted");
 
-            // Step 2: Transfer cart items to OrderProduct
             for (CartItem item : cartItems) {
                 orderDAO.addOrderProduct(orderID, item.getDeviceID(), item.getQuantity());
             }
 
-            // Step 3: Clear the cart
             cartDAO.clearCart(customerID);
 
-            // Step 4: Redirect with success
             session.setAttribute("cartItems", null);
             session.setAttribute("message", "✅ Order submitted successfully!");
             response.sendRedirect("main.jsp");
