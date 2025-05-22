@@ -35,7 +35,7 @@ public class CartDAO {
             );
             item.setDeviceName(rs.getString("deviceName"));
             item.setUnitPrice(rs.getDouble("unitPrice"));
-            item.setMaxStock(rs.getInt("maxStock")); // ✅ sets stockQty
+            item.setMaxStock(rs.getInt("maxStock"));
             cart.add(item);
         }
         return cart;
