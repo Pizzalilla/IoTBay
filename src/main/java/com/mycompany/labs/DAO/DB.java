@@ -4,12 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * DB handles JDBC connection setup.
- * Works for both Tomcat and GlassFish.
- */
 public class DB {
-    
     private static final String URL = "jdbc:derby://localhost:1527/IoTbayDB";
     private static final String USER = "test";     // your db username
     private static final String PASS = "test123";     // your db password
@@ -31,3 +26,4 @@ public class DB {
         return conn;
     }
 }
+

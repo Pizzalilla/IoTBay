@@ -16,6 +16,7 @@ public class User {
     private String mobile;
     private String gender;
     private String favouriteColour;
+    private boolean isStaff;
 
     public String getEmail() {
         return email;
@@ -73,4 +74,11 @@ public class User {
         this.favouriteColour = favouriteColour;
     }
 
+    public boolean isStaff() {
+        return isStaff;
+    }
+
+    public void setStaff(boolean staff) {
+        isStaff = staff;
+    }
 }
