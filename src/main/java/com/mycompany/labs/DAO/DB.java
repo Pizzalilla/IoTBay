@@ -5,31 +5,25 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DB {
-    private static final String DB_URL = "jdbc:sqlite:";
+    private static final String URL = "jdbc:derby://localhost:1527/IoTbayDB";
+    private static final String USER = "test";     // your db username
+    private static final String PASS = "test123";     // your db password
+    private static final String DRIVER = "org.apache.derby.jdbc.ClientDriver";
 
-    // Method to get a connection to the SQLite database
     public static Connection getConnection() throws SQLException {
-        String dbPath = "C:\\Users\\20828\\IdeaProjects\\IoTBay\\db.sqlite";
         try {
-            Class.forName("org.sqlite.JDBC");
+            System.out.println("⏳ Loading Derby driver...");
+            Class.forName(DRIVER);
+            System.out.println("✅ Derby driver loaded.");
         } catch (ClassNotFoundException e) {
-            System.err.println("SQLite JDBC driver not found.");
+            System.out.println("❌ Derby driver NOT FOUND.");
             e.printStackTrace();
+            throw new SQLException("Derby driver not found in classpath", e);
         }
 
-        // Establish and return connection
-        return DriverManager.getConnection(DB_URL+dbPath);
-    }
-
-    public static void main(String[] args) {
-        try (Connection conn = getConnection()) {
-            if (conn != null) {
-                System.out.println("Connection to SQLite has been established.");
-            }
-        } catch (SQLException e) {
-            System.err.println("Connection failed.");
-            e.printStackTrace();
-        }
+        Connection conn = DriverManager.getConnection(URL, USER, PASS);
+        System.out.println("✅ Connected to database!");
+        return conn;
     }
 }
 
