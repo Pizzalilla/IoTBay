@@ -33,22 +33,15 @@
                             <a class="nav-link active" aria-current="page" href="./home">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Orders</a>
+                            <a class="nav-link active" aria-current="page" href="OrderHistoryServlet">Orders</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Shipments</a>
+                            <a class="nav-link active" aria-current="page" href="payment.jsp">Payments</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Payments</a>
-                        </li>
-                        <% if(currentUser.isStaff()) {
+                        <% if(currentUser.getType().equals("staff")) {
                             %>
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="devices">Devices</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="/">Users</a>
                             </li>
                         <%
                         }%>

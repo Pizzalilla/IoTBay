@@ -1,12 +1,15 @@
 package com.mycompany.labs.controller;
 
-import com.mycompany.labs.dao.LogDao;
-import com.mycompany.labs.dao.UserDao;
+import com.mycompany.labs.DAO.LogDao;
+import com.mycompany.labs.DAO.UserDao;
 import com.mycompany.labs.model.User;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -38,7 +41,7 @@ public class LoginServlet extends HttpServlet {
                     UserDao userDao = new UserDao();
                     request.setAttribute("userList", userDao.getAllUsers());
                     request.getRequestDispatcher("admin.jsp").forward(request, response);
-                } catch (SQLException | ClassNotFoundException e) {
+                } catch (SQLException e) {
                     e.printStackTrace();
                     request.setAttribute("loginError", "Unable to load users for admin.");
                     request.getRequestDispatcher("login.jsp").forward(request, response);
@@ -64,7 +67,7 @@ public class LoginServlet extends HttpServlet {
                 String logId = logDao.insertLog(user.getUserID());
                 session.setAttribute("logId", logId);
 
-                response.sendRedirect("main.jsp");
+                response.sendRedirect("home");
             } else {
                 request.setAttribute("loginError", "Invalid email or password.");
                 request.getRequestDispatcher("login.jsp").forward(request, response);

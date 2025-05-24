@@ -1,11 +1,15 @@
 package com.mycompany.labs.controller;
 
-import com.mycompany.labs.dao.UserDao;
+import com.mycompany.labs.DAO.UserDao;
 import com.mycompany.labs.model.User;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -30,7 +34,7 @@ public class DeleteAccountServlet extends HttpServlet {
 
             session.invalidate();
             response.sendRedirect("login.jsp");
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("error", "Failed to delete account: " + e.getMessage());
             request.getRequestDispatcher("main.jsp").forward(request, response);
