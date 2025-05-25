@@ -8,20 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PaymentDAO {
-    private Connection connectToDB() throws SQLException {
-        try {
-            Class.forName("org.apache.derby.jdbc.ClientDriver");
-        } catch (ClassNotFoundException e) {
-            throw new SQLException("Derby JDBC Driver not found", e);
-        }
-        String dbURL = "jdbc:derby://localhost:1527/usersdb";
-        String user = "app";
-        String password = "app";
-        return DriverManager.getConnection(dbURL, user, password);
+    private Connection conn;
+    public PaymentDAO() throws SQLException {
+        this.conn = DB.getConnection();
     }
+
     public void createPayment(Payment payment) throws SQLException {
         String sql = "INSERT INTO Payment (orderID, paymentMethod, paymentDate, amount, status) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = connectToDB();
+        try (
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, payment.getOrderID());
             stmt.setString(2, payment.getPaymentMethod());
@@ -35,7 +29,7 @@ public class PaymentDAO {
     public List<Payment> getAllPayments() throws SQLException {
         List<Payment> payments = new ArrayList<>();
         String sql = "SELECT * FROM Payment";
-        try (Connection conn = connectToDB();
+        try (
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
@@ -47,7 +41,7 @@ public class PaymentDAO {
 
     public Payment getPaymentById(int paymentId) throws SQLException {
         String sql = "SELECT * FROM Payment WHERE paymentID = ?";
-        try (Connection conn = connectToDB();
+        try (
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, paymentId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -61,7 +55,7 @@ public class PaymentDAO {
 
     public void updatePayment(Payment payment) throws SQLException {
         String sql = "UPDATE Payment SET orderID=?, paymentMethod=?, paymentDate=?, amount=?, status=? WHERE paymentID=?";
-        try (Connection conn = connectToDB();
+        try (
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, payment.getOrderID());
             stmt.setString(2, payment.getPaymentMethod());
@@ -75,7 +69,7 @@ public class PaymentDAO {
 
     public void deletePayment(int paymentId) throws SQLException {
         String sql = "DELETE FROM Payment WHERE paymentID = ?";
-        try (Connection conn = connectToDB();
+        try (
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, paymentId);
             stmt.executeUpdate();
@@ -96,7 +90,7 @@ public class PaymentDAO {
             params.add(paymentDate);
         }
 
-        try (Connection conn = connectToDB();
+        try (
              PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 stmt.setObject(i + 1, params.get(i));
