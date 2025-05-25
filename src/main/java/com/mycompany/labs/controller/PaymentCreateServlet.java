@@ -16,7 +16,12 @@ import java.sql.*;
 @WebServlet("/PaymentCreateServlet")
 public class PaymentCreateServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        PaymentDAO dao = new PaymentDAO();
+        PaymentDAO dao = null;
+        try {
+            dao = new PaymentDAO();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         HttpSession session = request.getSession();
 
         try {
