@@ -11,12 +11,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/PaymentSearchServlet")
 public class PaymentSearchServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ServletException, IOException {
-        PaymentDAO dao = new PaymentDAO();
+        PaymentDAO dao = null;
+        try {
+            dao = new PaymentDAO();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         try {
             Integer paymentId = parseInteger(request.getParameter("paymentId"));
