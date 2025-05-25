@@ -9,11 +9,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.SQLException;
 
 @WebServlet("/PaymentDeleteServlet")
 public class PaymentDeleteServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, IOException {
-        PaymentDAO dao = new PaymentDAO();
+        PaymentDAO dao = null;
+        try {
+            dao = new PaymentDAO();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         HttpSession session = request.getSession();
 
         try {
